@@ -1,18 +1,31 @@
+/* COVID-19 DATA EXPLORATION
+
+Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+
+*/
+
+
+--Select statement to read all the data ordered by the 3 and 4th column
+
 Select * from Portfolio_Project..CovidDeaths$ order by 3,4
-
-
 Select * from Portfolio_Project..CovidVaccinations$ order by 3,4
+
+
 
 --Total Cases VS Total Death Comparison 
 
 Select location,date, total_cases, total_deaths, (total_deaths/total_cases) * 100 as DeathPercentage
 from Portfolio_Project..CovidDeaths$  where location like '%Canada%' order by 1,2
 
+
+
 -- Total cases VS Population
 -- shows what percentage of population has covid
 
 Select location,date, total_cases, population, (total_cases/population) * 100 as CasePercentage
 from Portfolio_Project..CovidDeaths$  where location like '%Canada%' order by 1,2
+
+
 
 -- Countries with highest infection rate compared with population
 
@@ -23,11 +36,19 @@ from Portfolio_Project..CovidDeaths$
 group by location,population
 order by PercentagePopulationInfected desc
 
+
+
+/* We can in location field we have continents(Asia, Africa etc), 
+
+we need to remove thos for better understanding of data based on each country */
+
 -- To remove continents from the data 
 
 Select continent, location, population from Portfolio_Project..CovidDeaths$ 
 where continent is not null 
 order by 1
+
+
 
 -- shows countries with highest deathcount per population
 
@@ -38,12 +59,16 @@ where continent is not null
 group by location
 order by TotalDeathCount desc
 
+
+
 --showing continents with Highest Death Count
 
 Select continent,MAX(cast(total_deaths as int)) as TotalDeathCount
 from Portfolio_Project..CovidDeaths$
 group by continent 
 order by TotalDeathCount desc
+
+
 
 --Filtering out based on the whole world and date
 
@@ -55,12 +80,16 @@ group by date
 order by 1,2
 
 
+
+
 --JOIN both data
 
 Select * from Portfolio_Project..CovidDeaths$ dea
 JOIN Portfolio_Project..CovidVaccinations$ vac
 ON dea.location = vac.location 
 and dea.date = vac.date
+
+
 
 -- finding people in the world that are vaccinated
 
@@ -72,6 +101,8 @@ JOIN Portfolio_Project..CovidVaccinations$ vac
 where dea.continent is not null
 order by 1,2
 
+
+
 -- find sum of people vaccinated in a country
 
 Select dea.continent, dea.location,dea.date ,dea.population , vac.new_vaccinations,
@@ -82,6 +113,8 @@ JOIN Portfolio_Project..CovidVaccinations$ vac
 	and dea.date = vac.date
 where dea.continent is not null
 order by 2,3
+
+
 
 --CTE
 
@@ -98,6 +131,8 @@ where dea.continent is not null
 --order by 2,3
 )
 Select *, (RollingPeopleVaccinated/Population) * 100 from PopVSVac
+
+
 
 -- Create View 
 Create view PercentageTotalVaccinations as
